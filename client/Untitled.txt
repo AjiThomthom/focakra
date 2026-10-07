@@ -1,0 +1,21 @@
+
+pm2 delete all
+pm2 flush
+
+cd "/home/server/cakra/aiservices"
+pm2 start /home/server/cakra/venv-shared/bin/python --name "cakra-ai" --cwd "/home/server/cakra/aiservices" -- -m uvicorn app:app --host 0.0.0.0 --port 8001
+
+# Jika service API utama (port 8000) ada di folder lain (misal root cakra atau direktori tersendiri):
+cd "/home/server/cakra"
+pm2 start /home/server/cakra/venv-shared/bin/python --name "cakra-api" --cwd "/home/server/cakra/api" -- -m uvicorn app:app --host 0.0.0.0 --port 8000
+
+
+cd /home/server/cakra/client
+
+# 2. Hapus proses cakra-client lama dari PM2 (jika ada)
+pm2 stop cakra-client 2>/dev/null
+pm2 delete cakra-client 2>/dev/null
+
+# 3. Jalankan service client baru
+pm2 start npm --name "cakra-client" --cwd "/home/server/cakra/client" -- start -- -p 3000
+
